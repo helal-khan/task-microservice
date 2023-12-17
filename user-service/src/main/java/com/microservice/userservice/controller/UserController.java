@@ -6,12 +6,14 @@ import com.microservice.userservice.entity.User;
 import com.microservice.userservice.service.UserService;
 import com.microservice.userservice.util.Formatter;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import com.microservice.userservice.validator.UserValidator;
 
 import javax.validation.ValidationException;
+import java.util.Objects;
 
 @RequiredArgsConstructor
 @RestController
@@ -40,6 +42,9 @@ public class UserController {
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public UserDTO update(@PathVariable Long id, @RequestBody UserDTO userDTO, BindingResult result) {
+        if (!Objects.equals(id, userDTO.getId())) {
+            throw new RuntimeException("ID mismatch");
+        }
         userValidator.validate(userDTO, result);
         if (result.hasErrors()) {
             throw new ValidationException(Formatter.getErrors(result));

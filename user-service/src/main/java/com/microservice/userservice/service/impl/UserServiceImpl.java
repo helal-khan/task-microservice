@@ -8,6 +8,9 @@ import com.microservice.userservice.entity.User;
 import com.microservice.userservice.repository.UserRepository;
 import com.microservice.userservice.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,11 +30,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "user", key = "#id")
     public UserDTO get(final Long id) {
         return mapperRegistry.getMapper(User.class, UserDTO.class).map(findUser(id));
     }
 
     @Override
+    @CachePut(cacheNames = "user", key = "#userDTO.id")
     public UserDTO update(final Long id, final UserDTO userDTO) {
         final User existingUser = findUser(id);
         existingUser.setName(userDTO.getName());
@@ -39,6 +44,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @CacheEvict(cacheNames = "user", key = "#id")
     public void delete(final Long id) {
         userRepository.delete(findUser(id));
     }

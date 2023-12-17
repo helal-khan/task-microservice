@@ -43,4 +43,26 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
                 HttpStatus.BAD_REQUEST
         );
     }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFoundException(final NotFoundException exception) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .status(HttpStatus.NOT_FOUND)
+                        .message(exception.getMessage())
+                        .build(),
+                HttpStatus.BAD_REQUEST
+        );
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ErrorResponse> handleRuntimeException(final RuntimeException exception) {
+        return new ResponseEntity<>(
+                ErrorResponse.builder()
+                        .status(HttpStatus.BAD_REQUEST)
+                        .message(exception.getMessage())
+                        .build(),
+                HttpStatus.BAD_REQUEST
+        );
+    }
 }
